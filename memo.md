@@ -4,6 +4,46 @@
 nix build
 ```
 
+## install to system
+
+```nix
+{
+  inputs = {
+    # ...
+    # containerd-shim-wasmtime-v1
+    containerd-shim-wasmtime-v1 = {
+      url = "github:aki-ph-chem/runwasi-flake/feat/containerd-shim-wasmtime-v1";
+    };
+  };
+
+
+  outputs = inputs @ {
+   containerd-shim-wasmtime-v1,
+    ...
+  }: {
+    nixosConfigurations.my-system = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      specialArgs = {inherit inputs;};
+
+      virtualisation = {
+        # cotainerd
+        containerd = {
+          enable = true;
+        };
+       # others 
+      };
+
+      systemd.services.containerd = {
+        path = [
+          containerd-shim-wasmtime-v1.packages.x86_64-linux.default
+        ];
+      };
+
+    };
+  }
+}
+```
+
 ## how to use runwasi 
 
 - ref
