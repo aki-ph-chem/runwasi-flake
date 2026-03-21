@@ -2,7 +2,6 @@
 
 ```bash
 nix build
-nix shell .
 ```
 
 ## how to use runwasi 
