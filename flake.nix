@@ -4,6 +4,10 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
     rust-overlay.url = "github:oxalica/rust-overlay";
+    runwasi-src = {
+      url = "github:containerd/runwasi?rev=cf51126b59adffc18538c839922125e74e512b0d";
+      flake = false;
+    };
   };
 
   outputs =
@@ -11,6 +15,7 @@
       self,
       nixpkgs,
       rust-overlay,
+      runwasi-src,
     }:
     let
       system = "x86_64-linux";
@@ -33,10 +38,7 @@
         pname = "runwasi";
         version = "0-unstable-2026-03-02";
         doCheck = false;
-        src = pkgs.fetchurl {
-          url = "https://github.com/containerd/runwasi/archive/refs/heads/main.tar.gz";
-          hash = "sha256-2QeDkfOlKSJHzPg1pP9G49HuF2S6vRIHGit8XsbHPYw=";
-        };
+        src = runwasi-src;
 
         cargoHash = "sha256-lsiCdfxQ0BpavoV1ar0yXPa/16AgDl31umoBCguPowE=";
 
