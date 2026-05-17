@@ -52,12 +52,6 @@
         nativeBuildInputs = with pkgs; [
           protobuf
           pkg-config
-          dbus-glib
-          libelf
-          libseccomp
-          libclang
-          zstd
-          openssl_3
           cmake
           gnumake
           gcc
