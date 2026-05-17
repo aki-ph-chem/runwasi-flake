@@ -35,66 +35,14 @@
           rustc = rustToolchain;
         };
 
-        wasmedgeArchive = pkgs.fetchurl {
-          url = "https://github.com/WasmEdge/WasmEdge/releases/download/0.14.1/WasmEdge-0.14.1-fmt-patch-debian11_x86_64_static.tar.gz";
-          sha256 = "sha256-CuSU8OJR1/4bB+QhoZic4qnyvzKEHOMIbfwI7xjJ/Pg=";
+        shims = pkgs.callPackages ./pkgs/runwasi-shims.nix {
+          inherit rustPlatform runwasi-src;
         };
 
-        makeShim =
-          {
-            binName,
-            cargoHash,
-            extraBuildInputs ? [ ],
-            extraNativeBuildInputs ? [ ],
-          }:
-          rustPlatform.buildRustPackage {
-            pname = "runwasi";
-            version = "0-unstable-2026-03-02";
-            src = runwasi-src;
-            cargoHash = cargoHash;
-
-            doCheck = false;
-            buildAndTestSubdir = ".";
-            cargoBuildFlags = [
-              "--bin"
-              binName
-            ];
-
-            nativeBuildInputs = [
-              pkgs.protobuf
-              pkgs.pkg-config
-              pkgs.cmake
-              pkgs.llvmPackages.clang
-            ]
-            ++ extraNativeBuildInputs;
-
-            CMAKE_POLICY_VERSION_MINIMUM = 3.5;
-            LIBCLANG_PATH = pkgs.lib.makeLibraryPath ([
-              pkgs.llvmPackages.libclang
-            ]);
-            WASMEDGE_STANDALONE_ARCHIVE = "${wasmedgeArchive}";
-
-            buildInputs = [
-              pkgs.systemd
-              pkgs.dbus-glib
-              pkgs.libelf
-              pkgs.libseccomp
-              pkgs.zstd
-              pkgs.openssl_3
-            ]
-            ++ extraBuildInputs;
-
-          };
-
-        containerd-shim-wasmtime-v1 = makeShim {
-          binName = "containerd-shim-wasmtime-v1";
-          cargoHash = "sha256-lsiCdfxQ0BpavoV1ar0yXPa/16AgDl31umoBCguPowE=";
-
-        };
       in
       {
-        packages = {
-          default = containerd-shim-wasmtime-v1;
+        packages = shims // {
+          default = shims.containerd-shim-wasmtime-v1;
         };
       }
     );
