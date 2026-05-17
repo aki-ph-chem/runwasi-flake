@@ -54,11 +54,12 @@
           pkgs.protobuf
           pkgs.pkg-config
           pkgs.cmake
+          pkgs.llvmPackages.clang
         ];
 
         CMAKE_POLICY_VERSION_MINIMUM = 3.5;
         LIBCLANG_PATH = pkgs.lib.makeLibraryPath ([
-          pkgs.libclang
+          pkgs.llvmPackages.libclang
         ]);
         WASMEDGE_STANDALONE_ARCHIVE = "${wasmedgeArchive}";
 
@@ -67,7 +68,6 @@
           pkgs.dbus-glib
           pkgs.libelf
           pkgs.libseccomp
-          pkgs.libclang
           pkgs.zstd
           pkgs.openssl_3
         ];
