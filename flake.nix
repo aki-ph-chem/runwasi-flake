@@ -40,46 +40,62 @@
           sha256 = "sha256-CuSU8OJR1/4bB+QhoZic4qnyvzKEHOMIbfwI7xjJ/Pg=";
         };
 
-        containerd-shim-wasmtime-v1 = rustPlatform.buildRustPackage {
-          pname = "runwasi";
-          version = "0-unstable-2026-03-02";
-          src = runwasi-src;
+        makeShim =
+          {
+            binName,
+            cargoHash,
+            extraBuildInputs ? [ ],
+            extraNativeBuildInputs ? [ ],
+          }:
+          rustPlatform.buildRustPackage {
+            pname = "runwasi";
+            version = "0-unstable-2026-03-02";
+            src = runwasi-src;
+            cargoHash = cargoHash;
+
+            doCheck = false;
+            buildAndTestSubdir = ".";
+            cargoBuildFlags = [
+              "--bin"
+              binName
+            ];
+
+            nativeBuildInputs = [
+              pkgs.protobuf
+              pkgs.pkg-config
+              pkgs.cmake
+              pkgs.llvmPackages.clang
+            ]
+            ++ extraNativeBuildInputs;
+
+            CMAKE_POLICY_VERSION_MINIMUM = 3.5;
+            LIBCLANG_PATH = pkgs.lib.makeLibraryPath ([
+              pkgs.llvmPackages.libclang
+            ]);
+            WASMEDGE_STANDALONE_ARCHIVE = "${wasmedgeArchive}";
+
+            buildInputs = [
+              pkgs.systemd
+              pkgs.dbus-glib
+              pkgs.libelf
+              pkgs.libseccomp
+              pkgs.zstd
+              pkgs.openssl_3
+            ]
+            ++ extraBuildInputs;
+
+          };
+
+        containerd-shim-wasmtime-v1 = makeShim {
+          binName = "containerd-shim-wasmtime-v1";
           cargoHash = "sha256-lsiCdfxQ0BpavoV1ar0yXPa/16AgDl31umoBCguPowE=";
-
-          doCheck = false;
-          buildAndTestSubdir = ".";
-          cargoBuildFlags = [
-            "--bin"
-            "containerd-shim-wasmtime-v1"
-          ];
-
-          nativeBuildInputs = [
-            pkgs.protobuf
-            pkgs.pkg-config
-            pkgs.cmake
-            pkgs.llvmPackages.clang
-          ];
-
-          CMAKE_POLICY_VERSION_MINIMUM = 3.5;
-          LIBCLANG_PATH = pkgs.lib.makeLibraryPath ([
-            pkgs.llvmPackages.libclang
-          ]);
-          WASMEDGE_STANDALONE_ARCHIVE = "${wasmedgeArchive}";
-
-          buildInputs = [
-            pkgs.systemd
-            pkgs.dbus-glib
-            pkgs.libelf
-            pkgs.libseccomp
-            pkgs.zstd
-            pkgs.openssl_3
-          ];
 
         };
       in
       {
-        packages.default = containerd-shim-wasmtime-v1;
-
+        packages = {
+          default = containerd-shim-wasmtime-v1;
+        };
       }
     );
 }
