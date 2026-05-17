@@ -1,5 +1,5 @@
 {
-  description = "build containerd-shim-wasmtime-v1";
+  description = "build containerd-shim-wasmtime-v1 (x86_64-linux only)";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
