@@ -22,7 +22,7 @@ jobs:
         uses: DeterminateSystems/magic-nix-cache-action@main
 
       - name: Check Nix formatting
-        run: nix run nixpkgs#nixpkgs-fmt -- --check .
+        run: nix run nixpkgs#nixfmt-tree -- --ci
 
       - name: Lint Nix files
         run: nix run nixpkgs#statix -- check .
