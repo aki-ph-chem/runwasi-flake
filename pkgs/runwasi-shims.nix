@@ -31,7 +31,7 @@ let
       pname = "runwasi";
       version = "0-unstable-2026-03-02";
       src = runwasi-src;
-      cargoHash = cargoHash;
+      inherit cargoHash;
 
       doCheck = false;
       buildAndTestSubdir = ".";
@@ -49,9 +49,9 @@ let
       ++ extraNativeBuildInputs;
 
       CMAKE_POLICY_VERSION_MINIMUM = 3.5;
-      LIBCLANG_PATH = lib.makeLibraryPath ([
+      LIBCLANG_PATH = lib.makeLibraryPath [
         llvmPackages.libclang
-      ]);
+      ];
       WASMEDGE_STANDALONE_ARCHIVE = "${wasmedgeArchive}";
 
       buildInputs = [
